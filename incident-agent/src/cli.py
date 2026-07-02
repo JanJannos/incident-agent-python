@@ -13,7 +13,10 @@ import json
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+_SRC_DIR = Path(__file__).resolve().parent
+_PROJECT_ROOT = _SRC_DIR.parent.parent
+sys.path.insert(0, str(_PROJECT_ROOT))
+sys.path.insert(0, str(_SRC_DIR))
 
 from db_client import close_db  # noqa: E402
 from run_investigation import AgentEvent, get_usage_log, run_investigation  # noqa: E402

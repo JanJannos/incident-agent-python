@@ -1,9 +1,4 @@
-"""Plain query functions used by the agent's tools.
-
-Port of src/tools/getEvents.ts, getEntityState.ts, replayEvents.ts,
-checkIdempotency.ts, and diagnose.ts. These are the raw (non-LLM-facing)
-implementations; agent_tools.py wraps them for the Groq tool-calling API.
-"""
+"""Plain query functions used by the incident investigator agent."""
 
 from __future__ import annotations
 
@@ -18,10 +13,6 @@ def get_events(
     topic: str | None = None,
     partition: int | None = None,
 ) -> list[dict[str, Any]]:
-    """Get raw event log entries filtered by event_key, topic, and/or partition.
-
-    Returns rows ordered by offset ascending, with `payload` parsed from JSON.
-    """
     db = get_db()
 
     query = "SELECT * FROM event_log WHERE 1=1"
@@ -50,7 +41,6 @@ def get_events(
 
 
 def get_entity_state(entity_id: str) -> dict[str, Any] | None:
-    """Get the current persisted state of an entity (order, user, etc)."""
     db = get_db()
 
     row = db.execute(
@@ -71,7 +61,6 @@ def get_entity_state(entity_id: str) -> dict[str, Any] | None:
 
 
 def replay_events(event_key: str) -> list[dict[str, Any]]:
-    """Reconstruct the full event sequence for one entity_id, with was_processed flags."""
     db = get_db()
 
     rows = db.execute(
@@ -105,7 +94,6 @@ def replay_events(event_key: str) -> list[dict[str, Any]]:
 
 
 def check_idempotency(event_id: str) -> dict[str, Any]:
-    """Check whether a specific event was processed and recorded in the idempotency table."""
     db = get_db()
 
     row = db.execute(
@@ -125,7 +113,6 @@ def check_idempotency(event_id: str) -> dict[str, Any]:
 
 
 def diagnose(entity_id: str, bug_type: str, evidence: str, fix: str) -> dict[str, Any]:
-    """Echo the final diagnosis fields (terminal tool)."""
     return {
         "entity_id": entity_id,
         "bug_type": bug_type,

@@ -1,11 +1,4 @@
-"""Round-robin Groq API key manager with revocation persistence.
-
-Port of src/config/groqKeyManager.ts. Keys are loaded from
-`../../config/groq.keys` (relative to this file, i.e. the repo root's
-`config/` directory, a sibling of the `incident-agent` package). State
-(current round-robin index + revoked keys) persists to
-`../../config/.groq-state.json`.
-"""
+"""Round-robin Groq API key manager with revocation persistence."""
 
 from __future__ import annotations
 
@@ -14,9 +7,9 @@ import json
 import sys
 from pathlib import Path
 
-_THIS_DIR = Path(__file__).resolve().parent
-KEYS_FILE = (_THIS_DIR / ".." / ".." / "config" / "groq.keys").resolve()
-STATE_FILE = (_THIS_DIR / ".." / ".." / "config" / ".groq-state.json").resolve()
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+KEYS_FILE = _REPO_ROOT / "config" / "groq.keys"
+STATE_FILE = _REPO_ROOT / "config" / ".groq-state.json"
 
 
 def _key_fingerprint(key: str) -> str:
@@ -31,7 +24,6 @@ class GroqKeyManager:
         self.keys: list[str] = []
         self.current_index: int = 0
         self.revoked_keys: set[str] = set()
-
         self._load_keys()
         self._load_state()
 
@@ -56,7 +48,6 @@ class GroqKeyManager:
                 state = json.loads(content)
                 self.current_index = state.get("currentIndex", 0) or 0
                 raw_revoked = state.get("revokedKeys", []) or []
-                # Migrate legacy state files that stored full gsk_ keys.
                 self.revoked_keys = {
                     _key_fingerprint(item) if str(item).startswith("gsk_") else str(item)
                     for item in raw_revoked
