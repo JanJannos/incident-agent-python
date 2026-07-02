@@ -1,0 +1,3 @@
+# Copy to groq.keys (one Groq API key per line). Never commit groq.keys.
+gsk_your_groq_api_key_here_1
+gsk_your_groq_api_key_here_2

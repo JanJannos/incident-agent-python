@@ -11,12 +11,18 @@ env/
 *.db-wal
 *.db-shm
 
-# Secrets & local config
+# Secrets & local config — NEVER commit these
 config/groq.keys
 config/.groq-state.json
 .env
 .env.*
 !.env.example
+*.pem
+*.p12
+*.key
+credentials.json
+secrets.json
+**/settings.local.json
 
 # Logs
 logs/

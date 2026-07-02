@@ -9,6 +9,7 @@ Port of src/config/groqKeyManager.ts. Keys are loaded from
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -16,6 +17,11 @@ from pathlib import Path
 _THIS_DIR = Path(__file__).resolve().parent
 KEYS_FILE = (_THIS_DIR / ".." / ".." / "config" / "groq.keys").resolve()
 STATE_FILE = (_THIS_DIR / ".." / ".." / "config" / ".groq-state.json").resolve()
+
+
+def _key_fingerprint(key: str) -> str:
+    """Stable ID for revocation state — never persist full API keys on disk."""
+    return hashlib.sha256(key.encode("utf-8")).hexdigest()[:16]
 
 
 class GroqKeyManager:
@@ -49,7 +55,12 @@ class GroqKeyManager:
                 content = STATE_FILE.read_text(encoding="utf-8")
                 state = json.loads(content)
                 self.current_index = state.get("currentIndex", 0) or 0
-                self.revoked_keys = set(state.get("revokedKeys", []) or [])
+                raw_revoked = state.get("revokedKeys", []) or []
+                # Migrate legacy state files that stored full gsk_ keys.
+                self.revoked_keys = {
+                    _key_fingerprint(item) if str(item).startswith("gsk_") else str(item)
+                    for item in raw_revoked
+                }
         except Exception:
             print("Could not load key state, starting fresh", file=sys.stderr)
 
@@ -72,14 +83,14 @@ class GroqKeyManager:
             key = self.keys[self.current_index]
             self.current_index = (self.current_index + 1) % len(self.keys)
 
-            if key not in self.revoked_keys:
+            if _key_fingerprint(key) not in self.revoked_keys:
                 return key
             attempts += 1
 
         raise RuntimeError("All Groq keys have been revoked")
 
     def mark_key_as_revoked(self, key: str) -> None:
-        self.revoked_keys.add(key)
+        self.revoked_keys.add(_key_fingerprint(key))
         self._save_state()
         print(f"\U0001f511 Key revoked: {key[:10]}...", file=sys.stderr)
 

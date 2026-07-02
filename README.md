@@ -22,14 +22,19 @@ Auto-creates a virtualenv, installs dependencies, and seeds the database on firs
 
 ## Config
 
-Put Groq API keys in `config/groq.keys` (one per line):
-```
-gsk_KEY_1
-gsk_KEY_2
-gsk_KEY_3
+**Do not commit API keys.** `config/groq.keys` and `config/.groq-state.json` are gitignored.
+
+```bash
+cp config/groq.keys.example config/groq.keys
+# edit config/groq.keys — one Groq API key per line
 ```
 
-Agent auto-rotates keys and skips revoked ones (state persisted in `config/.groq-state.json`).
+```
+gsk_your_groq_api_key_here_1
+gsk_your_groq_api_key_here_2
+```
+
+Agent auto-rotates keys and skips revoked ones (fingerprints only in `config/.groq-state.json`).
 
 ## Manual commands
 

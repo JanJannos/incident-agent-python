@@ -27,7 +27,7 @@ Auto-creates a virtualenv, installs dependencies, and seeds the database.
 
 ```
 📊 Starting investigation for order_1000 (model: llama-3.3-70b-versatile)
-🔑 Using Groq key: gsk_Y5nhrSp... (6 keys available)
+🔑 Using Groq key: gsk_xxxxxxxxxx... (3 keys available)
 
 ============================================================
 📋 INVESTIGATION RESULT
@@ -69,11 +69,16 @@ python3 -m venv .venv
 
 ## Key Management
 
-Keys are stored in `config/groq.keys` (one per line):
+Keys are stored in `config/groq.keys` (one per line). Copy from the example first:
+
+```bash
+cp config/groq.keys.example config/groq.keys
+# then edit config/groq.keys with your real keys
 ```
-gsk_YOUR_KEY_1
-gsk_YOUR_KEY_2
-gsk_YOUR_KEY_3
+
+```
+gsk_your_groq_api_key_here_1
+gsk_your_groq_api_key_here_2
 ```
 
 Revoked keys are tracked in `config/.groq-state.json` (auto-created).
