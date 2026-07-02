@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Incident DB Explorer</title>
+    <script src="/theme.js"></script>
+    <link rel="stylesheet" href="/theme.css" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div>
+        <h1>Incident DB Explorer</h1>
+        <p class="subtitle">Query and inspect the simulated incidents SQLite database</p>
+      </div>
+      <div class="header-actions">
+        <div class="header-meta" id="db-meta">Loading…</div>
+        <a href="/agent.html" class="nav-link">🕵️ Live Agent →</a>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="query">SQL Query</button>
+      <button class="tab" data-tab="tables">Tables</button>
+      <button class="tab" data-tab="tools">Agent Tools</button>
+      <button class="tab" data-tab="investigate">Investigate</button>
+    </nav>
+
+    <main>
+      <section id="panel-query" class="panel active">
+        <div class="panel-toolbar">
+          <label for="preset-select">Presets</label>
+          <select id="preset-select">
+            <option value="">Choose a preset…</option>
+            <option value="all-tables">All tables (list)</option>
+            <option value="entities">All entities</option>
+            <option value="events-order">Events for order_1000</option>
+            <option value="replay">Replay events for order_1000</option>
+            <option value="idempotency">Idempotency keys</option>
+            <option value="expected">Expected state (ground truth)</option>
+          </select>
+          <button id="run-query" class="primary">Run Query</button>
+        </div>
+        <textarea id="sql-editor" spellcheck="false">SELECT * FROM entities ORDER BY entity_id;</textarea>
+        <div id="query-status" class="status"></div>
+        <div id="query-results" class="results"></div>
+      </section>
+
+      <section id="panel-tables" class="panel">
+        <div class="tables-layout">
+          <aside class="table-list" id="table-list"></aside>
+          <div class="table-view">
+            <div class="panel-toolbar">
+              <h2 id="table-title">Select a table</h2>
+              <button id="refresh-table" class="secondary">Refresh</button>
+            </div>
+            <div id="table-results" class="results"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="panel-tools" class="panel">
+        <div class="tools-grid">
+          <div class="card">
+            <h3>get_entity_state</h3>
+            <input id="tool-entity-id" placeholder="entity_id (e.g. order_1000)" value="order_1000" />
+            <button data-tool="get_entity_state">Run</button>
+          </div>
+          <div class="card">
+            <h3>get_events</h3>
+            <input id="tool-event-key" placeholder="event_key" value="order_1000" />
+            <button data-tool="get_events">Run</button>
+          </div>
+          <div class="card">
+            <h3>replay_events</h3>
+            <input id="tool-replay-key" placeholder="event_key" value="order_1000" />
+            <button data-tool="replay_events">Run</button>
+          </div>
+          <div class="card">
+            <h3>check_idempotency</h3>
+            <input id="tool-event-id" placeholder="event_id (UUID)" />
+            <button data-tool="check_idempotency">Run</button>
+          </div>
+        </div>
+        <div id="tools-status" class="status"></div>
+        <pre id="tools-results" class="json-output"></pre>
+      </section>
+
+      <section id="panel-investigate" class="panel">
+        <div class="investigate-form">
+          <input id="investigate-entity" placeholder="entity_id" value="order_1000" />
+          <label class="checkbox">
+            <input type="checkbox" id="investigate-cheap" />
+            Use cheap model (8B)
+          </label>
+          <button id="run-investigate" class="primary">Run AI Investigation</button>
+        </div>
+        <p class="hint">Spawns <code>incident-agent</code> as a separate process. May take a few seconds.</p>
+        <div id="investigate-status" class="status"></div>
+        <pre id="investigate-results" class="json-output"></pre>
+      </section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
